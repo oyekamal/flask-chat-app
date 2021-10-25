@@ -1,10 +1,12 @@
+from logging import debug
 from flask import Flask, render_template, request, redirect, url_for
-
+from flask_socketio import SocketIO, join_room
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/')
-def hello_world():
+def home():
     # return "hello world"
     return render_template("index.html")
 
@@ -19,5 +21,13 @@ def chat():
         return redirect(url_for("home"))
 
 
+@socketio.on("join_room")
+def handle_join_room_event(data):
+    print("data---->",data)
+    app.logger.info("{} has joined the room {}".format(data['username'], data["room"]) )
+    join_room(data['room'])
+    socketio.emit("join_room_announcement",data)
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    # app.run(debug=True)
+    socketio.run(app, debug= True)
