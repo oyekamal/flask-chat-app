@@ -14,8 +14,8 @@
 
     <div id="message"></div>
 
-    <form>
-        <input type="text" placeholder="Enter your message...">
+    <form id="message_input_form">
+        <input id="message_input" type="text" placeholder="Enter your message...">
         <button type="submit">send</button>
     </form>
 </body>
@@ -31,10 +31,34 @@
         })
     })
 
+    let message_input = document.getElementById('message_input');
+
+    document.getElementById("message_input_form").onsubmit = function(e){
+        e.preventDefault();
+        let message = message_input.value.trim();
+        if (message.length){
+            socket.emit('send_message',{
+                username: "{{username}}",
+                room: "{{room}}",
+                message: message
+            })
+            message_input.value = '';
+            message_input.focus();
+        }
+
+    }
+
     socket.on("join_room_announcement",function(data){
         console.log(data);
         const newNode = document.createElement('div');
         newNode.innerHTML =  `<b>${data.username}</b> has join the room `;
+        document.getElementById("message").appendChild(newNode);
+    })
+
+    socket.on("receive_message",function(data){
+        console.log(data);
+        const newNode = document.createElement('div');
+        newNode.innerHTML =  `<b>${data.username}</b>: ${data.message} `;
         document.getElementById("message").appendChild(newNode);
     })
 

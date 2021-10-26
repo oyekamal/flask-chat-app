@@ -21,6 +21,12 @@ def chat():
         return redirect(url_for("home"))
 
 
+@socketio.on("send_message")
+def handle_send_message(data):
+    app.logger.info("{} has send the message to room {}: {}".format(data['username'],data['room'], data['message']))
+
+    socketio.emit('receive_message', data, room=data['room'])
+
 @socketio.on("join_room")
 def handle_join_room_event(data):
     print("data---->",data)
