@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash
-
+from user import User
 #sudo  docker exec -it mongodb mongo  
 #to run the mongodb in docker
 
@@ -25,5 +25,10 @@ def save_user(username, email, password):
     "email":email,"password":password_hash})      
 
 
+def get_user(username):
+    user_data = users_collection.find_one({"_id":username})
+    print("user_data-------",user_data)
+    return User(username = user_data['_id'],email = user_data['email'], password= user_data["password"]) if user_data else None
 
-save_user("oykamal", "oyekamalkhan@gmail.com", "pass")
+
+# save_user("oykamal", "oyekamalkhan@gmail.com", "pass")
